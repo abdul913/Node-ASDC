@@ -1,38 +1,49 @@
-const http = require('http');
+const express = require('express')
+const app = express()
+const port = 3000
 
-let prodData = [{ id: 1, name: "iphone" }, { id: 2, name: "samsung" }, { id: 3, name: "google" }]
+let todos = []
 
-function handler(req, res) {
-    // if(req.url == '/home'){
-    //     res.write("Hello World")
-    //     res.end()
-    // }
-    // if(req.url == '/products'){
-    //     res.write("products")
-    //     res.end()
-    // }
-    switch (req.url) {
-        case '/':
-            res.write("Hello World")
-            res.end()
-            break;
-        case '/products':
-            res.write(JSON.stringify(prodData))
-            res.end()
-            break;
+// json middleware
+app.use(express.json())
 
-        default:
-            res.write("no route defined")
-            res.end()
-
-            break;
+// Cus-Middleware
+function checklistMiddleware(req, res, next) {
+    if (todos[0].length < 1) {
+        // console.log('no data')
+        res.status(404).send("wrong req")
+        return
     }
-
+    next()
 }
 
-const server = http.createServer(handler)
+app.get('/todo', checklistMiddleware, (req, res) => {
+    // let num = req.query.num
+    // let val = num * 2
+    res.status(200)
+    res.json(todos)
+})
 
-const port = 2000
+app.post('/todo', (req, res) => {
+    let input = req.body
+    todos.push(input)
+    res.json({ message: 'data has been posted' })
+})
 
-server.listen(port, () => { console.log('server running on port', port) })
+app.put('/todo', (req, res) => {
+    let input = req.body
+    todos[0] = input
+    res.json({ message: 'data has been posted' })
+})
 
+app.delete('/todo', (req, res) => {
+    let input = req.body
+    let todoItem = req.query.num
+    todos.splice(todoItem, 1)
+    res.json({ message: 'data has been deleted' })
+})
+
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
