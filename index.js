@@ -1,12 +1,19 @@
 const express = require('express')
 const app = express()
 const port = 3000
+const mongoose = require('mongoose');
+const users = require("./Routes/users")
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser')
 
-let todos = []
+mongoose.connect('mongodb+srv://abdul:abc1234@cluster0.7aw0lly.mongodb.net/user')
+    .then(() => console.log('Connected!'));
+
+
 
 // json middleware
 app.use(express.json())
-
+app.use(cookieParser())
 // Cus-Middleware
 function checklistMiddleware(req, res, next) {
     if (todos[0].length < 1) {
@@ -17,31 +24,15 @@ function checklistMiddleware(req, res, next) {
     next()
 }
 
-app.get('/todo', checklistMiddleware, (req, res) => {
-    // let num = req.query.num
-    // let val = num * 2
-    res.status(200)
-    res.json(todos)
-})
+app.use('/', users)
 
-app.post('/todo', (req, res) => {
-    let input = req.body
-    todos.push(input)
-    res.json({ message: 'data has been posted' })
-})
+app.use('/', users)
 
-app.put('/todo', (req, res) => {
-    let input = req.body
-    todos[0] = input
-    res.json({ message: 'data has been posted' })
-})
+app.use('/', users);
 
-app.delete('/todo', (req, res) => {
-    let input = req.body
-    let todoItem = req.query.num
-    todos.splice(todoItem, 1)
-    res.json({ message: 'data has been deleted' })
-})
+app.use('/', users)
+
+app.use('/', users)
 
 
 app.listen(port, () => {
